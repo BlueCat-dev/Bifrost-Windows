@@ -6,7 +6,7 @@ dist/
 *.dylib
 *.test
 test-*
-bifrost
+/bifrost
 
 # Private keys & certificates (Strict security)
 *.key

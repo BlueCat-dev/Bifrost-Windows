@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/milad-ai/bifrost-windows/internal/config"
-	"github.com/milad-ai/bifrost-windows/internal/core"
+	"github.com/Qorvhex/Bifrost/windows/internal/config"
+	"github.com/Qorvhex/Bifrost/windows/internal/core"
 )
 
 // TestSecurityMiddlewareBlocksAttacks verifies that DNS rebinding and Cross-Origin attacks are blocked

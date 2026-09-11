@@ -1,0 +1,90 @@
+name: Build Bifrost Windows
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    paths:
+      - "windows/**"
+      - ".github/workflows/windows.yml"
+    tags: [ "v*" ]
+  pull_request:
+    branches: [ "main", "master" ]
+    paths:
+      - "windows/**"
+      - ".github/workflows/windows.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-windows:
+    name: Build & Package Windows Desktop Client
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go 1.22
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: windows/go.sum
+
+      - name: Install NSIS Compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nsis
+
+      - name: Run Test Suite
+        run: |
+          cd windows
+          go test -v ./...
+
+      - name: Compile Windows Executable
+        run: |
+          cd windows
+          mkdir -p dist
+          APP_VER="${{ github.ref_name }}"
+          if [ -z "$APP_VER" ] || [[ "$APP_VER" == "main" ]] || [[ "$APP_VER" == "master" ]]; then
+            APP_VER="dev-$(git rev-parse --short HEAD)"
+          fi
+          echo "Compiling Bifrost Windows for version: $APP_VER"
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build \
+            -ldflags "-s -w -H=windowsgui -X main.Version=$APP_VER" \
+            -o dist/Bifrost.exe \
+            ./cmd/bifrost
+
+      - name: Build Setup Installer (NSIS)
+        run: |
+          cd windows
+          makensis installer.nsi
+
+      - name: Generate Cryptographic SHA-256 Checksums
+        run: |
+          cd windows/dist
+          sha256sum Bifrost.exe Bifrost-Setup.exe > checksums.txt
+          cat checksums.txt
+
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Bifrost-Windows-Binaries
+          path: windows/dist/*
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Attach Assets to Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            windows/dist/Bifrost.exe
+            windows/dist/Bifrost-Setup.exe
+            windows/dist/checksums.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

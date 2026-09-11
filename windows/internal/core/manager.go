@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/milad-ai/bifrost-windows/internal/config"
+	"github.com/Qorvhex/Bifrost/windows/internal/config"
 )
 
 // BridgeStatus describes the global operational state of Bifrost

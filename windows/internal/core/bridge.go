@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/milad-ai/bifrost-windows/internal/config"
+	"github.com/Qorvhex/Bifrost/windows/internal/config"
 )
 
 // WebSocketBridge pipes bidirectional traffic between a Telegram TCP socket

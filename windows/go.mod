@@ -1,4 +1,4 @@
-module github.com/milad-ai/bifrost-windows
+module github.com/Qorvhex/Bifrost/windows
 
 go 1.22.6
 

@@ -10,7 +10,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/milad-ai/bifrost-windows/internal/config"
+	"github.com/Qorvhex/Bifrost/windows/internal/config"
 )
 
 // Socks5Server implements an RFC 1928 SOCKS5 proxy bound strictly to 127.0.0.1

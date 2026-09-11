@@ -17,9 +17,9 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/milad-ai/bifrost-windows/internal/config"
-	"github.com/milad-ai/bifrost-windows/internal/core"
-	"github.com/milad-ai/bifrost-windows/internal/updater"
+	"github.com/Qorvhex/Bifrost/windows/internal/config"
+	"github.com/Qorvhex/Bifrost/windows/internal/core"
+	"github.com/Qorvhex/Bifrost/windows/internal/updater"
 )
 
 //go:embed static
@@ -91,14 +91,15 @@ func securityMiddleware(next http.Handler) http.Handler {
 
 // Server provides the local HTTP control dashboard and WebSocket API
 type Server struct {
-	port       int
-	version    string
-	cm         *config.ConfigManager
-	bm         *core.BridgeManager
-	httpServer *http.Server
-	listener   net.Listener
-	shutdownCh chan struct{}
-	mu         sync.Mutex
+	port         int
+	version      string
+	cm           *config.ConfigManager
+	bm           *core.BridgeManager
+	httpServer   *http.Server
+	listener     net.Listener
+	shutdownCh   chan struct{}
+	latestUpdate *updater.UpdateInfo
+	mu           sync.Mutex
 }
 
 // Port returns the actual bound port
@@ -423,6 +424,10 @@ func (s *Server) handleCheckUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	s.mu.Lock()
+	s.latestUpdate = info
+	s.mu.Unlock()
+
 	s.writeJSON(w, http.StatusOK, map[string]any{
 		"success":         true,
 		"has_update":      info.HasUpdate,
@@ -437,29 +442,44 @@ func (s *Server) handleApplyUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req struct {
-		DownloadURL string `json:"download_url"`
-	}
-	_ = json.NewDecoder(r.Body).Decode(&req)
+	s.mu.Lock()
+	info := s.latestUpdate
+	s.mu.Unlock()
 
-	targetURL := req.DownloadURL
-	if targetURL == "" {
-		info, err := updater.CheckUpdate(s.version, "")
-		if err != nil || info == nil || info.DownloadURL == "" {
-			s.writeJSON(w, http.StatusBadRequest, map[string]any{"success": false, "error": "آدرس دانلود نسخه جدید یافت نشد"})
+	if info == nil || !info.HasUpdate {
+		var err error
+		info, err = updater.CheckUpdate(s.version, "")
+		if err != nil || info == nil || !info.HasUpdate {
+			s.writeJSON(w, http.StatusBadRequest, map[string]any{
+				"success": false,
+				"error":   "نسخه جدیدی برای به‌روزرسانی یافت نشد",
+			})
 			return
 		}
-		targetURL = info.DownloadURL
+		s.mu.Lock()
+		s.latestUpdate = info
+		s.mu.Unlock()
 	}
 
-	if err := updater.ApplyUpdate(targetURL); err != nil {
-		s.writeJSON(w, http.StatusInternalServerError, map[string]any{"success": false, "error": err.Error()})
+	if info.DownloadURL == "" || info.ExpectedSHA256 == "" {
+		s.writeJSON(w, http.StatusBadRequest, map[string]any{
+			"success": false,
+			"error":   "هش امنیتی SHA-256 یا فایل رسمی در این نسخه موجود نیست. جهت امنیت شما، از نصب باینری تأییدنشده جلوگیری شد.",
+		})
+		return
+	}
+
+	if err := updater.ApplyUpdate(info); err != nil {
+		s.writeJSON(w, http.StatusInternalServerError, map[string]any{
+			"success": false,
+			"error":   err.Error(),
+		})
 		return
 	}
 
 	s.writeJSON(w, http.StatusOK, map[string]any{
 		"success": true,
-		"message": "به‌روزرسانی با موفقیت دریافت و اعمال شد. برنامه در حال راه‌اندازی مجدد است.",
+		"message": "به‌روزرسانی رسمی گیت‌هاب با موفقیت راستی‌آزمایی، دریافت و اعمال شد. برنامه در حال راه‌اندازی مجدد است.",
 	})
 }
 

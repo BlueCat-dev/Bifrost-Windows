@@ -160,20 +160,31 @@ function isVersionGreater(remote, current) {
   return false;
 }
 
-// Fallback Browser Direct Fetch for Update Manifest
+// Fallback Browser Direct Fetch for Official GitHub Release
 async function tryDirectBrowserFetch() {
-  const urls = [
-    'https://hermes.miladiran.online/f/bifrost-version.json',
-    'https://monitor.bluecats.ir/f/bifrost-version.json'
-  ];
-  for (const u of urls) {
-    try {
-      const resp = await fetch(u, { cache: 'no-store' });
-      if (resp.ok) {
-        return await resp.json();
+  const repo = 'Qorvhex/Bifrost';
+  const url = `https://api.github.com/repos/${repo}/releases/latest`;
+  try {
+    const resp = await fetch(url, {
+      headers: { 'Accept': 'application/vnd.github.v3+json' },
+      cache: 'no-store'
+    });
+    if (resp.ok) {
+      const rel = await resp.json();
+      const ver = (rel.tag_name || rel.name || '').replace(/^v/, '');
+      let setupUrl = rel.html_url || `https://github.com/${repo}/releases/latest`;
+      if (rel.assets && Array.isArray(rel.assets)) {
+        const setupAsset = rel.assets.find(a => a.name && a.name.toLowerCase().includes('setup'));
+        if (setupAsset) setupUrl = setupAsset.browser_download_url;
       }
-    } catch (_) {}
-  }
+      return {
+        version: ver,
+        changelog: rel.body || '',
+        setup_url: setupUrl,
+        release_url: rel.html_url
+      };
+    }
+  } catch (_) {}
   return null;
 }
 
@@ -235,19 +246,18 @@ async function applyUpdateNow() {
   const btn = document.getElementById('btnApplyUpdate');
   if (btn) {
     btn.disabled = true;
-    btn.textContent = 'در حال دریافت و اعمال نسخه جدید...';
+    btn.textContent = 'در حال دریافت، اعتبارسنجی هش امنیتی و اعمال نسخه جدید...';
   }
 
   try {
-    const payload = state.latestUpdateInfo ? { download_url: state.latestUpdateInfo.download_url } : {};
-    const res = await api('/api/update/apply', 'POST', payload);
+    const res = await api('/api/update/apply', 'POST', {});
     if (res.success) {
-      showToast('نسخه جدید دریافت شد! برنامه در حال راه‌اندازی مجدد است...');
+      showToast('نسخه رسمی جدید راستی‌آزمایی و دریافت شد! برنامه در حال راه‌اندازی مجدد است...');
       setTimeout(() => {
         closeModal('modalUpdate');
       }, 1200);
     } else {
-      showToast('خطا در به‌روزرسانی خودکار: ' + (res.error || 'ناشناخته'));
+      showToast('خطا در به‌روزرسانی: ' + (res.error || 'ناشناخته'));
       if (btn) {
         btn.disabled = false;
         btn.textContent = 'به‌روزرسانی خودکار و راه‌اندازی مجدد';
@@ -263,7 +273,7 @@ async function applyUpdateNow() {
 }
 
 function openDirectDownloadLink() {
-  const url = (state.latestUpdateInfo && state.latestUpdateInfo.setup_url) || 'https://hermes.miladiran.online/f/Bifrost-Setup.exe';
+  const url = (state.latestUpdateInfo && (state.latestUpdateInfo.setup_url || state.latestUpdateInfo.release_url)) || 'https://github.com/Qorvhex/Bifrost/releases/latest';
   window.open(url, '_blank');
 }
 
