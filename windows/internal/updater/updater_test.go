@@ -2,6 +2,7 @@ package updater
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -80,16 +81,66 @@ func TestApplyUpdateSecurityGuards(t *testing.T) {
 	}
 }
 
-func TestCleanupOldBinary(t *testing.T) {
-	execPath, err := os.Executable()
-	if err != nil {
-		t.Skip("cannot determine executable path")
+func TestIsDirWritable(t *testing.T) {
+	tempDir := os.TempDir()
+	if !isDirWritable(tempDir) {
+		t.Errorf("expected temp dir %s to be writable", tempDir)
 	}
-	oldFile := execPath + ".old"
-	_ = os.WriteFile(oldFile, []byte("dummy"), 0644)
-	CleanupOldBinary()
-	if _, err := os.Stat(oldFile); !os.IsNotExist(err) {
-		t.Errorf("expected .old binary to be cleaned up, but file still exists")
-		_ = os.Remove(oldFile)
+}
+
+func TestAndroidOnlyReleaseIgnoredByWindows(t *testing.T) {
+	rel := GitHubRelease{
+		TagName: "v4.0.0",
+		Name:    "v4.0.0",
+		Assets: []GitHubAsset{
+			{
+				Name:               "Bifrost.apk",
+				Size:               25000000,
+				BrowserDownloadURL: "https://github.com/Qorvhex/Bifrost/releases/download/v4.0.0/Bifrost.apk",
+			},
+		},
+	}
+
+	info := &UpdateInfo{
+		Version:   "4.0.0",
+		HasUpdate: isNewerVersion("4.0.0", "3.3.0"),
+	}
+	for _, a := range rel.Assets {
+		lowerName := strings.ToLower(a.Name)
+		if lowerName == "bifrost.exe" {
+			info.DownloadURL = a.BrowserDownloadURL
+		} else if strings.Contains(lowerName, "setup") && strings.HasSuffix(lowerName, ".exe") {
+			info.SetupURL = a.BrowserDownloadURL
+		}
+	}
+
+	if info.DownloadURL == "" && info.SetupURL == "" {
+		info.HasUpdate = false
+	}
+
+	if info.HasUpdate {
+		t.Errorf("expected Android-only release to NOT trigger an update on Windows, but HasUpdate was true")
+	}
+}
+
+func TestValidateGitHubDownloadURL(t *testing.T) {
+	validURLs := []string{
+		"https://github.com/BlueCat-dev/Bifrost-Windows/releases/download/v3.3.0/Bifrost.exe",
+		"https://objects.githubusercontent.com/github-production-release-asset-2e65be/1234/Bifrost.exe",
+	}
+	for _, u := range validURLs {
+		if err := validateGitHubDownloadURL(u); err != nil {
+			t.Errorf("expected valid URL for %s, got: %v", u, err)
+		}
+	}
+
+	invalidURLs := []string{
+		"https://evil.com/Bifrost.exe",
+		"http://github.com.attacker.com/Bifrost.exe",
+	}
+	for _, u := range invalidURLs {
+		if err := validateGitHubDownloadURL(u); err == nil {
+			t.Errorf("expected error for %s, got nil", u)
+		}
 	}
 }

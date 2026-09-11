@@ -5,15 +5,16 @@ dist/
 *.so
 *.dylib
 *.test
+*.syso
 test-*
 /bifrost
 
-# Private keys & certificates (Strict security)
+# Private keys & certificates
 *.key
 *.pfx
 *.pem
-certs/*.key
-certs/*.pfx
+*.crt
+*.cer
 
 # Local user configs
 bifrost_config.json

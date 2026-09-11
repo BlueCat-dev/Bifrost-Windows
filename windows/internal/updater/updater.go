@@ -23,10 +23,10 @@ import (
 )
 
 const (
-	// DefaultUpstreamRepo points to the official Bifrost upstream repository
-	DefaultUpstreamRepo = "Qorvhex/Bifrost"
+	// DefaultUpdateRepo points to the official Bifrost Windows repository
+	DefaultUpdateRepo = "BlueCat-dev/Bifrost-Windows"
 
-	// UserAgent header required by GitHub API
+	// UserAgentHeader required by GitHub API
 	UserAgentHeader = "Bifrost-Windows-Client/3.3.0 (Windows NT 10.0; Win64; x64)"
 )
 
@@ -70,6 +70,7 @@ type UpdateInfo struct {
 	SetupURL       string `json:"setup_url"`
 	ReleaseURL     string `json:"release_url"`
 	ExpectedSHA256 string `json:"expected_sha256"`
+	SetupSHA256    string `json:"setup_sha256"`
 	Changelog      string `json:"changelog"`
 	HasUpdate      bool   `json:"has_update"`
 }
@@ -79,7 +80,7 @@ func GetUpdateRepo() string {
 	if repo := os.Getenv("BIFROST_UPDATE_REPO"); repo != "" {
 		return strings.TrimSpace(repo)
 	}
-	return DefaultUpstreamRepo
+	return DefaultUpdateRepo
 }
 
 // CheckUpdate queries official GitHub Releases API for the latest release
@@ -119,26 +120,42 @@ func CheckUpdate(currentVersion string, customRepo string) (*UpdateInfo, error) 
 			}
 		} else if strings.Contains(lowerName, "setup") && strings.HasSuffix(lowerName, ".exe") {
 			info.SetupURL = a.BrowserDownloadURL
+			if strings.HasPrefix(a.Digest, "sha256:") {
+				info.SetupSHA256 = strings.TrimPrefix(a.Digest, "sha256:")
+			}
 		} else if lowerName == "checksums.txt" || lowerName == "sha256sums.txt" {
 			checksumsAssetURL = a.BrowserDownloadURL
 		}
 	}
 
+	// Critical Guard against Android-only or non-Windows releases:
+	// If the release doesn't contain Bifrost.exe or Bifrost-Setup.exe, it is NOT an update for Windows!
+	if info.DownloadURL == "" && info.SetupURL == "" {
+		info.HasUpdate = false
+	}
+
 	// If SHA-256 wasn't in asset metadata, fetch checksums.txt if available
-	if info.ExpectedSHA256 == "" && checksumsAssetURL != "" {
+	if checksumsAssetURL != "" {
 		if sums, err := fetchChecksumsFile(checksumsAssetURL); err == nil {
 			for fName, hash := range sums {
-				if strings.EqualFold(fName, "bifrost.exe") {
+				lowerF := strings.ToLower(fName)
+				if lowerF == "bifrost.exe" && info.ExpectedSHA256 == "" {
 					info.ExpectedSHA256 = hash
-					break
+				} else if strings.Contains(lowerF, "setup") && strings.HasSuffix(lowerF, ".exe") && info.SetupSHA256 == "" {
+					info.SetupSHA256 = hash
 				}
 			}
 		}
 	}
 
-	// Fallback: parse SHA-256 for Bifrost.exe from the release body notes if present
-	if info.ExpectedSHA256 == "" && rel.Body != "" {
-		info.ExpectedSHA256 = extractSHA256FromText(rel.Body, "Bifrost.exe")
+	// Fallback: parse SHA-256 from the release body notes if present
+	if rel.Body != "" {
+		if info.ExpectedSHA256 == "" {
+			info.ExpectedSHA256 = extractSHA256FromText(rel.Body, "Bifrost.exe")
+		}
+		if info.SetupSHA256 == "" {
+			info.SetupSHA256 = extractSHA256FromText(rel.Body, "Setup.exe")
+		}
 	}
 
 	return info, nil
@@ -288,14 +305,20 @@ func CleanupOldBinary() {
 	}
 }
 
-// ApplyUpdate downloads the official executable from GitHub, strictly verifies its SHA-256 hash, and restarts
-func ApplyUpdate(info *UpdateInfo) error {
-	if info == nil || info.DownloadURL == "" {
-		return fmt.Errorf("no valid official update information provided")
+// isDirWritable checks if the current process has write permissions in the directory
+func isDirWritable(dir string) bool {
+	testFile := filepath.Join(dir, fmt.Sprintf(".perm_test_%d", time.Now().UnixNano()))
+	f, err := os.OpenFile(testFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	if err != nil {
+		return false
 	}
+	_ = f.Close()
+	_ = os.Remove(testFile)
+	return true
+}
 
-	// Strict Supply Chain Guard: Ensure download URL originates from official GitHub domains
-	parsedURL, err := url.Parse(info.DownloadURL)
+func validateGitHubDownloadURL(rawURL string) error {
+	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
 		return fmt.Errorf("invalid download URL format: %w", err)
 	}
@@ -306,11 +329,13 @@ func ApplyUpdate(info *UpdateInfo) error {
 		!strings.HasSuffix(hostname, ".githubusercontent.com") {
 		return fmt.Errorf("security violation: updates can only be downloaded from official GitHub domains (got: %s)", hostname)
 	}
+	return nil
+}
 
-	// Strict Integrity Guard: Require valid SHA-256 hash before applying any binary update
-	cleanExpectedHash := strings.ToLower(strings.TrimSpace(info.ExpectedSHA256))
-	if len(cleanExpectedHash) != 64 {
-		return fmt.Errorf("security requirement: missing or invalid SHA-256 checksum for update. Refusing to install unverified binary")
+// ApplyUpdate downloads official release files, strictly verifies SHA-256 hashes, and handles both portable and elevated Program Files installations
+func ApplyUpdate(info *UpdateInfo) error {
+	if info == nil {
+		return fmt.Errorf("no valid official update information provided")
 	}
 
 	execPath, err := os.Executable()
@@ -324,6 +349,65 @@ func ApplyUpdate(info *UpdateInfo) error {
 	}
 
 	dir := filepath.Dir(execPath)
+
+	// UAC Permission Handling for Program Files / Protected Directories:
+	// If current directory is not writable by standard user process (e.g. C:\Program Files\Bifrost),
+	// download the NSIS setup installer to %TEMP% and launch it with elevated UAC permissions (RunAs).
+	if !isDirWritable(dir) {
+		if info.SetupURL == "" {
+			return fmt.Errorf("write access denied to %s and no setup installer available for UAC elevation", dir)
+		}
+		if err := validateGitHubDownloadURL(info.SetupURL); err != nil {
+			return err
+		}
+
+		cleanSetupHash := strings.ToLower(strings.TrimSpace(info.SetupSHA256))
+		if len(cleanSetupHash) != 64 {
+			return fmt.Errorf("security requirement: missing or invalid SHA-256 checksum for setup installer")
+		}
+
+		tempSetup := filepath.Join(os.TempDir(), fmt.Sprintf("Bifrost-Setup-%s.exe", info.Version))
+		_ = os.Remove(tempSetup)
+
+		computedHash, err := downloadBinaryWithHash(info.SetupURL, tempSetup)
+		if err != nil {
+			_ = os.Remove(tempSetup)
+			return fmt.Errorf("failed to download setup installer: %w", err)
+		}
+
+		if !strings.EqualFold(computedHash, cleanSetupHash) {
+			_ = os.Remove(tempSetup)
+			return fmt.Errorf("cryptographic verification failed for setup installer (expected: %s, computed: %s)", cleanSetupHash, computedHash)
+		}
+
+		log.Printf("[Updater] Launching elevated setup installer via UAC: %s\n", tempSetup)
+		if err := runElevatedInstaller(tempSetup); err != nil {
+			_ = os.Remove(tempSetup)
+			return fmt.Errorf("failed to launch elevated installer: %w", err)
+		}
+
+		// Cleanly exit current process so installer can overwrite binary
+		go func() {
+			time.Sleep(500 * time.Millisecond)
+			os.Exit(0)
+		}()
+		return nil
+	}
+
+	// Portable Mode (Writable directory):
+	// Perform atomic in-place binary update without requiring UAC elevation.
+	if info.DownloadURL == "" {
+		return fmt.Errorf("no portable binary download URL available")
+	}
+	if err := validateGitHubDownloadURL(info.DownloadURL); err != nil {
+		return err
+	}
+
+	cleanExpectedHash := strings.ToLower(strings.TrimSpace(info.ExpectedSHA256))
+	if len(cleanExpectedHash) != 64 {
+		return fmt.Errorf("security requirement: missing or invalid SHA-256 checksum for update")
+	}
+
 	newPath := filepath.Join(dir, "Bifrost.exe.new")
 	oldPath := execPath + ".old"
 

@@ -10,7 +10,7 @@ const state = {
   proxies: [],
   lastPingMs: 0,
   editingProxyId: null,
-  appVersion: '2.2.0',
+  appVersion: '3.3.0',
   latestUpdateInfo: null
 };
 
@@ -195,7 +195,7 @@ async function checkUpdateManual() {
 
   try {
     let updateData = null;
-    let curVer = state.appVersion || '2.2.0';
+    let curVer = state.appVersion || '3.3.0';
 
     // 1. Try Go backend check first
     try {
@@ -614,7 +614,7 @@ function render() {
   }
 }
 
-// Global Process Termination on Native Window Close
+// Global Process Termination helper (invoked explicitly if needed)
 window.exitProcess = function() {
   try {
     navigator.sendBeacon('/api/shutdown', JSON.stringify({}));
@@ -624,10 +624,6 @@ window.exitProcess = function() {
     } catch (_) {}
   }
 };
-
-window.addEventListener('beforeunload', () => {
-  window.exitProcess();
-});
 
 // App Initialization
 document.addEventListener('DOMContentLoaded', async () => {

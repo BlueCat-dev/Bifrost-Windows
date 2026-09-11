@@ -53,7 +53,6 @@ Section "Bifrost Core" SecCore
   ; Clean up any legacy leftover files from older versions
   Delete "$INSTDIR\worker.js"
   Delete "$INSTDIR\README.md"
-  Delete "$INSTDIR\Bifrost-Certificate.cer"
   Delete "$INSTDIR\app.ico"
   Delete "$INSTDIR\Bifrost-Console.exe"
   Delete "$SMPROGRAMS\Bifrost\Bifrost (Console).lnk"
@@ -96,7 +95,6 @@ Section "Uninstall"
   Delete "$INSTDIR\Bifrost-Console.exe"
   Delete "$INSTDIR\worker.js"
   Delete "$INSTDIR\README.md"
-  Delete "$INSTDIR\Bifrost-Certificate.cer"
   Delete "$INSTDIR\app.ico"
   Delete "$INSTDIR\Uninstall.exe"
 
