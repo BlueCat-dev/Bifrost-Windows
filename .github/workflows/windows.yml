@@ -22,6 +22,8 @@ jobs:
   build-windows:
     name: Build & Package Windows Desktop Client
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Source Code
