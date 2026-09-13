@@ -27,9 +27,9 @@
 A high-performance, native Windows desktop client built from scratch in Go and Microsoft WebView2.
 
 ### 📥 Official Releases:
-Download verified Windows binaries directly from [GitHub Releases](https://github.com/Qorvhex/Bifrost/releases/latest):
-* 🚀 **[Bifrost-Setup.exe](https://github.com/Qorvhex/Bifrost/releases/latest)** (Official NSIS Setup Installer)
-* ⚡ **[Bifrost.exe](https://github.com/Qorvhex/Bifrost/releases/latest)** (Portable Standalone Executable)
+Download verified Windows binaries directly from [GitHub Releases](https://github.com/BlueCat-dev/Bifrost-Windows/releases/latest):
+* 🚀 **[Bifrost-Setup.exe](https://github.com/BlueCat-dev/Bifrost-Windows/releases/latest)** (Official NSIS Setup Installer)
+* ⚡ **[Bifrost.exe](https://github.com/BlueCat-dev/Bifrost-Windows/releases/latest)** (Portable Standalone Executable)
 
 ### 🌟 Windows Highlights:
 * **Native Desktop Window:** Independent Microsoft WebView2 UI with zero external browser popups.

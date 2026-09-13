@@ -2,22 +2,22 @@
 
 An ultra-lightweight, native Windows desktop client for routing Telegram traffic through Cloudflare Workers via TWP (MTProto over WebSocket), featuring a zero-log local SOCKS5 bridge, Microsoft WebView2 UI, and in-app self-updating engine.
 
-[![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D6.svg)](https://github.com/Qorvhex/Bifrost)
+[![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D6.svg)](https://github.com/BlueCat-dev/Bifrost-Windows)
 [![Go Version](https://img.shields.io/badge/Go-1.22+-00ADD8.svg)](https://golang.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](../../LICENSE)
-[![Latest Release](https://img.shields.io/badge/release-GitHub%20Releases-00E676.svg)](https://github.com/Qorvhex/Bifrost/releases/latest)
+[![Latest Release](https://img.shields.io/badge/release-GitHub%20Releases-00E676.svg)](https://github.com/BlueCat-dev/Bifrost-Windows/releases/latest)
 
 ---
 
 ## 📥 Downloads & Releases
 
-Precompiled and verified binaries are published directly to [GitHub Releases](https://github.com/Qorvhex/Bifrost/releases/latest):
+Precompiled and verified binaries are published directly to [GitHub Releases](https://github.com/BlueCat-dev/Bifrost-Windows/releases/latest):
 
 | File | Description | Download |
 |---|---|---|
-| **Bifrost-Setup.exe** | Official NSIS Setup Installer (Recommended) | [Download Setup Installer](https://github.com/Qorvhex/Bifrost/releases/latest) |
-| **Bifrost.exe** | Portable standalone executable (Zero install required) | [Download Portable Binary](https://github.com/Qorvhex/Bifrost/releases/latest) |
-| **checksums.txt** | Cryptographic SHA-256 integrity hashes | [View Checksums](https://github.com/Qorvhex/Bifrost/releases/latest) |
+| **Bifrost-Setup.exe** | Official NSIS Setup Installer (Recommended) | [Download Setup Installer](https://github.com/BlueCat-dev/Bifrost-Windows/releases/latest) |
+| **Bifrost.exe** | Portable standalone executable (Zero install required) | [Download Portable Binary](https://github.com/BlueCat-dev/Bifrost-Windows/releases/latest) |
+| **checksums.txt** | Cryptographic SHA-256 integrity hashes | [View Checksums](https://github.com/BlueCat-dev/Bifrost-Windows/releases/latest) |
 
 ---
 
