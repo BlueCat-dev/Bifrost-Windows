@@ -7,6 +7,10 @@ An ultra-lightweight, native Windows desktop client for routing Telegram traffic
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](../../LICENSE)
 [![Latest Release](https://img.shields.io/badge/release-GitHub%20Releases-00E676.svg)](https://github.com/BlueCat-dev/Bifrost-Windows/releases/latest)
 
+<p align="center">
+  <img src="../docs/screenshots/bifrost-windows-main.png" alt="Bifrost Windows Client Preview" width="380">
+</p>
+
 ---
 
 ## 📥 Downloads & Releases
