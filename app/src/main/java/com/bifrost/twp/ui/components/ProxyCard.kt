@@ -29,10 +29,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bifrost.twp.R
 import com.bifrost.twp.model.ProxyConfig
 import com.bifrost.twp.ui.theme.CardBackground
 import com.bifrost.twp.ui.theme.CardStroke
@@ -116,7 +118,7 @@ fun ProxyCard(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Edit,
-                            contentDescription = "Edit",
+                            contentDescription = stringResource(R.string.action_edit),
                             tint = TextSecondary,
                             modifier = Modifier.size(16.dp)
                         )
@@ -128,7 +130,7 @@ fun ProxyCard(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.QrCode,
-                            contentDescription = "Share",
+                            contentDescription = stringResource(R.string.action_share),
                             tint = TextSecondary,
                             modifier = Modifier.size(16.dp)
                         )
@@ -140,7 +142,7 @@ fun ProxyCard(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Delete,
-                            contentDescription = "Delete",
+                            contentDescription = stringResource(R.string.action_delete),
                             tint = DangerRed.copy(alpha = 0.8f),
                             modifier = Modifier.size(16.dp)
                         )
@@ -212,7 +214,7 @@ fun ProxyCard(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "Secret",
+                            text = stringResource(R.string.badge_secret),
                             color = TextMuted,
                             fontSize = 11.sp
                         )

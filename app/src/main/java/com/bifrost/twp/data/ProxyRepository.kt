@@ -31,6 +31,15 @@ class ProxyRepository private constructor(context: Context) {
     private val _isBridgeEnabledFlow = MutableStateFlow(false)
     val isBridgeEnabledFlow: StateFlow<Boolean> = _isBridgeEnabledFlow.asStateFlow()
 
+    private val _runOnStartupFlow = MutableStateFlow(false)
+    val runOnStartupFlow: StateFlow<Boolean> = _runOnStartupFlow.asStateFlow()
+
+    private val _appLanguageFlow = MutableStateFlow("en")
+    val appLanguageFlow: StateFlow<String> = _appLanguageFlow.asStateFlow()
+
+    private val _hasSelectedLanguageFlow = MutableStateFlow(false)
+    val hasSelectedLanguageFlow: StateFlow<Boolean> = _hasSelectedLanguageFlow.asStateFlow()
+
     init {
         loadData()
     }
@@ -42,6 +51,15 @@ class ProxyRepository private constructor(context: Context) {
 
         val bridgeEnabled = prefs.getBoolean(KEY_BRIDGE_ENABLED, false)
         _isBridgeEnabledFlow.value = bridgeEnabled
+
+        val runOnStartup = prefs.getBoolean(KEY_RUN_ON_STARTUP, false)
+        _runOnStartupFlow.value = runOnStartup
+
+        val lang = prefs.getString(KEY_APP_LANGUAGE, "en") ?: "en"
+        _appLanguageFlow.value = lang
+
+        val hasSelected = prefs.getBoolean(KEY_HAS_SELECTED_LANGUAGE, false)
+        _hasSelectedLanguageFlow.value = hasSelected
 
         val rawJson = prefs.getString(KEY_PROXIES, null)
         val list = mutableListOf<ProxyConfig>()
@@ -143,8 +161,30 @@ class ProxyRepository private constructor(context: Context) {
 
     @Synchronized
     fun setBridgeEnabled(enabled: Boolean) {
-        prefs.edit().putBoolean(KEY_BRIDGE_ENABLED, enabled).apply()
+        prefs.edit().putBoolean(KEY_BRIDGE_ENABLED, enabled).commit()
         _isBridgeEnabledFlow.value = enabled
+    }
+
+    @Synchronized
+    fun setRunOnStartup(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_RUN_ON_STARTUP, enabled).commit()
+        _runOnStartupFlow.value = enabled
+    }
+
+    @Synchronized
+    fun setAppLanguage(lang: String) {
+        prefs.edit().putString(KEY_APP_LANGUAGE, lang).apply()
+        _appLanguageFlow.value = lang
+    }
+
+    @Synchronized
+    fun confirmInitialLanguage(lang: String) {
+        prefs.edit()
+            .putString(KEY_APP_LANGUAGE, lang)
+            .putBoolean(KEY_HAS_SELECTED_LANGUAGE, true)
+            .apply()
+        _appLanguageFlow.value = lang
+        _hasSelectedLanguageFlow.value = true
     }
 
     /**
@@ -162,6 +202,9 @@ class ProxyRepository private constructor(context: Context) {
         private const val KEY_ACTIVE_ID = "key_active_proxy_id"
         private const val KEY_LOCAL_PORT = "key_local_socks5_port"
         private const val KEY_BRIDGE_ENABLED = "key_bridge_enabled"
+        private const val KEY_RUN_ON_STARTUP = "key_run_on_startup"
+        private const val KEY_APP_LANGUAGE = "key_app_language"
+        private const val KEY_HAS_SELECTED_LANGUAGE = "key_has_selected_language"
         const val DEFAULT_LOCAL_PORT = 5050
 
         @Volatile

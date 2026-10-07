@@ -16,6 +16,16 @@
     <string name="status_stopped">STOPPED</string>
     <string name="local_endpoint">Local SOCKS5: 127.0.0.1:%1$d</string>
 
+    <!-- Status Badges -->
+    <string name="status_streaming_badge">STREAMING (%1$d Active)</string>
+    <string name="status_ready_badge">READY / ZERO-IDLE</string>
+    <string name="status_standby_badge">STANDBY</string>
+    <string name="no_active_worker_title">No Active Worker Selected</string>
+    <string name="no_active_worker_sub">Add or select a worker config below to begin bridging.</string>
+    <string name="clean_ip_label">Clean IP: %1$s</string>
+    <string name="saved_workers_title">SAVED WORKERS</string>
+    <string name="configured_count_label">%1$d configured</string>
+
     <!-- Actions -->
     <string name="action_connect_telegram">Connect Telegram</string>
     <string name="action_add_proxy">Add Proxy</string>
@@ -27,8 +37,29 @@
     <string name="action_share">Share</string>
     <string name="action_save">Save</string>
     <string name="action_cancel">Cancel</string>
+    <string name="action_close">Close</string>
     <string name="action_copy_link">Copy Link</string>
     <string name="action_share_link">Share Link</string>
+    <string name="action_confirm_start">Confirm &amp; Continue</string>
+
+    <!-- Language Selection -->
+    <string name="lang_selection_title">Choose App Language</string>
+    <string name="lang_selection_subtitle">Please choose your preferred language to continue</string>
+    <string name="lang_en_label">English</string>
+    <string name="lang_fa_label">فارسی</string>
+    <string name="lang_en_preview">Default system typography</string>
+    <string name="lang_fa_preview">زبان فارسی</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_app_language_title">App Language</string>
+    <string name="settings_app_language_desc">Switch interface language and typography</string>
+    <string name="settings_create_proxy_btn">Create Proxy (Cloudflare)</string>
+    <string name="settings_run_on_startup_title">Run on startup</string>
+    <string name="settings_run_on_startup_desc">Automatically start proxy bridge when device boots</string>
+    <string name="settings_socks5_title">Local SOCKS5 Port</string>
+    <string name="settings_socks5_desc">Configure the local port where Telegram connects (127.0.0.1).</string>
+    <string name="msg_port_invalid">Port must be between 1024 and 65535</string>
 
     <!-- Form Fields -->
     <string name="field_name">Config Name (Optional)</string>
@@ -38,7 +69,7 @@
     <string name="field_port">Worker Port (Default: 443)</string>
     <string name="field_local_port">Local SOCKS5 Port</string>
 
-    <!-- Messages -->
+    <!-- Messages & Toasts -->
     <string name="msg_proxy_saved">Proxy saved successfully</string>
     <string name="msg_proxy_activated">Proxy activated</string>
     <string name="msg_proxy_deleted">Proxy deleted</string>
@@ -48,4 +79,42 @@
     <string name="msg_error_empty_host">Worker Host is required</string>
     <string name="msg_port_saved">Local port updated</string>
     <string name="msg_no_proxies">No proxies added yet.\nTap the + button below to add a Cloudflare Worker proxy.</string>
+    <string name="toast_bridge_stopped">Proxy bridge stopped</string>
+    <string name="toast_bridge_started">Proxy bridge started (Zero-Idle)</string>
+    <string name="toast_select_worker_first">Please select or add a worker config first</string>
+    <string name="toast_proxy_activated_named">Proxy %1$s activated</string>
+
+    <!-- Updates -->
+    <string name="update_dialog_title">Update Available</string>
+    <string name="update_dialog_desc">Version %1$s is available. Would you like to download it?</string>
+    <string name="update_action_github">Go to GitHub</string>
+    <string name="update_toast_latest">You are up to date</string>
+    <string name="update_toast_error">Update check failed: %1$s</string>
+
+    <!-- Create Proxy Dialog -->
+    <string name="cf_dialog_title">Create Proxy with Cloudflare</string>
+    <string name="cf_guide_header">Step-by-step token guide:</string>
+    <string name="cf_guide_body">1. Tap the button below to open Cloudflare token creation (required permissions are pre-selected).\n2. On Cloudflare, click Continue to summary and then Create Token.\n3. Copy the generated token and paste it into the API Key field below.</string>
+    <string name="cf_btn_open_cloudflare">Get API Key from Cloudflare</string>
+    <string name="cf_field_token_label">Cloudflare API Token (Required)</string>
+    <string name="cf_field_token_placeholder">Paste your token here</string>
+    <string name="cf_field_secret_label">Worker Secret Key (Optional)</string>
+    <string name="cf_field_secret_placeholder">To protect and authenticate worker access</string>
+    <string name="cf_btn_create_submit">Create Proxy</string>
+    <string name="cf_success_title">Operation Successful!</string>
+    <string name="cf_success_desc">Worker %1$s was deployed and added to active proxies.</string>
+    <string name="cf_err_empty_token">Please enter API Token first</string>
+
+    <!-- Additional Dialog & Badge Strings -->
+    <string name="dialog_add_proxy_title">Add Worker Proxy</string>
+    <string name="dialog_edit_proxy_title">Edit Proxy</string>
+    <string name="dialog_share_title">Share Proxy</string>
+    <string name="badge_secret">Secret</string>
+    <string name="share_chooser_title">Share Bifrost Proxy</string>
+    <string name="msg_error_qr">Error generating QR</string>
+    <string name="msg_twp_link_copied">twp:// link copied</string>
+    <string name="qr_scan_instruction">Point camera at a twp:// QR code</string>
+    <string name="action_torch">Torch</string>
+    <string name="cf_err_deploy_failed">Deployment failed</string>
+    <string name="msg_network_error">network error</string>
 </resources>

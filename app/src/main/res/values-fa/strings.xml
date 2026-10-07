@@ -1,0 +1,120 @@
+<resources>
+    <string name="app_name">بایفراست</string>
+    <string name="app_description">پل فوق‌سبک ساکس۵ تلگرام به ورکر کلادفلر</string>
+    <string name="title_qr_scanner">اسکن بارکد</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">سرویس بایفراست</string>
+    <string name="notification_channel_description">وضعیت پل پروکسی محلی ساکس۵</string>
+    <string name="notification_title">پل بایفراست</string>
+    <string name="notification_listening">آماده به کار روی 127.0.0.1:%1$d</string>
+    <string name="notification_active">در حال انتقال با %1$d اتصال فعال</string>
+
+    <!-- Status -->
+    <string name="status_listening">آماده به کار</string>
+    <string name="status_active">در حال انتقال</string>
+    <string name="status_stopped">متوقف شده</string>
+    <string name="local_endpoint">پروکسی محلی ساکس۵: 127.0.0.1:%1$d</string>
+
+    <!-- Status Badges -->
+    <string name="status_streaming_badge">در حال انتقال - %1$d فعال</string>
+    <string name="status_ready_badge">آماده به کار</string>
+    <string name="status_standby_badge">غیرفعال</string>
+    <string name="no_active_worker_title">هیچ ورکری انتخاب نشده است</string>
+    <string name="no_active_worker_sub">جهت برقراری ارتباط، یک ورکر را در پایین اضافه یا انتخاب کنید.</string>
+    <string name="clean_ip_label">آی‌پی تمیز: %1$s</string>
+    <string name="saved_workers_title">ورکرهای ذخیره‌شده</string>
+    <string name="configured_count_label">%1$d کانفیگ</string>
+
+    <!-- Actions -->
+    <string name="action_connect_telegram">اتصال به تلگرام</string>
+    <string name="action_add_proxy">افزودن پروکسی</string>
+    <string name="action_add_manual">افزودن دستی</string>
+    <string name="action_paste_clipboard">خواندن از کلیپ‌بورد</string>
+    <string name="action_scan_qr">اسکن بارکد</string>
+    <string name="action_edit">ویرایش</string>
+    <string name="action_delete">حذف</string>
+    <string name="action_share">اشتراک‌گذاری</string>
+    <string name="action_save">ذخیره</string>
+    <string name="action_cancel">انصراف</string>
+    <string name="action_close">بستن</string>
+    <string name="action_copy_link">کپی لینک</string>
+    <string name="action_share_link">ارسال لینک</string>
+    <string name="action_confirm_start">تایید و ورود به برنامه</string>
+
+    <!-- Language Selection -->
+    <string name="lang_selection_title">انتخاب زبان برنامه</string>
+    <string name="lang_selection_subtitle">لطفاً برای ادامه، زبان مورد نظر خود را انتخاب کنید</string>
+    <string name="lang_en_label">English</string>
+    <string name="lang_fa_label">فارسی</string>
+    <string name="lang_en_preview">English language</string>
+    <string name="lang_fa_preview">زبان فارسی</string>
+
+    <!-- Settings -->
+    <string name="settings_title">تنظیمات برنامه</string>
+    <string name="settings_app_language_title">زبان برنامه</string>
+    <string name="settings_app_language_desc">تغییر زبان رابط کاربری و قلم برنامه</string>
+    <string name="settings_create_proxy_btn">ساخت خودکار پروکسی با کلادفلر</string>
+    <string name="settings_run_on_startup_title">اجرا با روشن شدن گوشی</string>
+    <string name="settings_run_on_startup_desc">اجرای خودکار و فعال‌سازی پروکسی همزمان با روشن شدن دستگاه</string>
+    <string name="settings_socks5_title">پورت محلی ساکس۵</string>
+    <string name="settings_socks5_desc">پورتی که تلگرام جهت اتصال پروکسی محلی به آن متصل می‌شود.</string>
+    <string name="msg_port_invalid">پورت باید عددی بین ۱۰۲۴ تا ۶۵۵۳۵ باشد</string>
+
+    <!-- Form Fields -->
+    <string name="field_name">نام کانفیگ (اختیاری)</string>
+    <string name="field_worker_host">دامنه یا هاست ورکر (الزامی)</string>
+    <string name="field_clean_ip">آی‌پی تمیز کلودفلر (اختیاری)</string>
+    <string name="field_secret">رمز عبور ورکر (اختیاری)</string>
+    <string name="field_port">پورت ورکر</string>
+    <string name="field_local_port">پورت محلی ساکس۵</string>
+
+    <!-- Messages & Toasts -->
+    <string name="msg_proxy_saved">پروکسی با موفقیت ذخیره شد</string>
+    <string name="msg_proxy_activated">پروکسی فعال شد</string>
+    <string name="msg_proxy_deleted">پروکسی حذف شد</string>
+    <string name="msg_copied">لینک در کلیپ‌بورد کپی شد</string>
+    <string name="msg_invalid_clipboard">لینک معتبر پروکسی در کلیپ‌بورد یافت نشد</string>
+    <string name="msg_camera_permission_required">دسترسی به دوربین جهت اسکن بارکد مورد نیاز است</string>
+    <string name="msg_error_empty_host">آدرس دامنه ورکر الزامی است</string>
+    <string name="msg_port_saved">پورت محلی بروزرسانی شد</string>
+    <string name="msg_no_proxies">هنوز پروکسی اضافه نشده است.\nدکمه + را بزنید تا یک ورکر جدید اضافه نمایید.</string>
+    <string name="toast_bridge_stopped">پل پروکسی متوقف شد</string>
+    <string name="toast_bridge_started">پل پروکسی شروع به کار کرد</string>
+    <string name="toast_select_worker_first">لطفاً ابتدا یک ورکر را انتخاب یا ایجاد نمایید</string>
+    <string name="toast_proxy_activated_named">پروکسی %1$s فعال شد</string>
+
+    <!-- Updates -->
+    <string name="update_dialog_title">بروزرسانی جدید در دسترس است</string>
+    <string name="update_dialog_desc">نسخه جدید %1$s منتشر شده است. آیا مایل به دریافت آن هستید؟</string>
+    <string name="update_action_github">رفتن به صفحه دانلود</string>
+    <string name="update_toast_latest">شما از آخرین نسخه استفاده می‌کنید</string>
+    <string name="update_toast_error">خطا در بررسی بروزرسانی: %1$s</string>
+
+    <!-- Create Proxy Dialog -->
+    <string name="cf_dialog_title">ساخت خودکار پروکسی با کلادفلر</string>
+    <string name="cf_guide_header">راهنمای دریافت کلید:</string>
+    <string name="cf_guide_body">۱. روی دکمه زیر بزنید تا وارد صفحه ساخت کلید کلادفلر شوید.\n۲. در سایت کلادفلر دکمه تایید و سپس ساخت کلید را بزنید.\n۳. کلید ایجاد شده را کپی کرده و در کادر کلید اختصاصی وارد کنید.</string>
+    <string name="cf_btn_open_cloudflare">دریافت کلید از کلادفلر</string>
+    <string name="cf_field_token_label">کلید اختصاصی کلادفلر (الزامی)</string>
+    <string name="cf_field_token_placeholder">کلید ساخته شده را اینجا وارد کنید</string>
+    <string name="cf_field_secret_label">رمز عبور ورکر (اختیاری)</string>
+    <string name="cf_field_secret_placeholder">جهت محافظت و رمزگذاری دسترسی</string>
+    <string name="cf_btn_create_submit">ساخت پروکسی</string>
+    <string name="cf_success_title">عملیات موفقیت‌آمیز بود</string>
+    <string name="cf_success_desc">ورکر %1$s با موفقیت ساخته و به فهرست پروکسی‌های فعال اضافه شد.</string>
+    <string name="cf_err_empty_token">لطفاً ابتدا کلید اختصاصی را وارد کنید.</string>
+
+    <!-- Additional Dialog & Badge Strings -->
+    <string name="dialog_add_proxy_title">افزودن پروکسی ورکر</string>
+    <string name="dialog_edit_proxy_title">ویرایش پروکسی</string>
+    <string name="dialog_share_title">اشتراک‌گذاری پروکسی</string>
+    <string name="badge_secret">رمزدار</string>
+    <string name="share_chooser_title">اشتراک‌گذاری پروکسی بایفراست</string>
+    <string name="msg_error_qr">خطا در ساخت بارکد</string>
+    <string name="msg_twp_link_copied">لینک اشتراک پروکسی کپی شد</string>
+    <string name="qr_scan_instruction">دوربین را به سمت بارکد پروکسی بگیرید</string>
+    <string name="action_torch">چراغ‌قوه</string>
+    <string name="cf_err_deploy_failed">عملیات ساخت و استقرار با خطا مواجه شد</string>
+    <string name="msg_network_error">خطای شبکه</string>
+</resources>

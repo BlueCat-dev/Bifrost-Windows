@@ -17,6 +17,8 @@
 -keep class com.google.zxing.** { *; }
 -dontwarn com.google.zxing.**
 
-# Bifrost Models & Core
+# Bifrost Models, Core, Data & Utils
 -keep class com.bifrost.twp.model.** { *; }
 -keep class com.bifrost.twp.core.** { *; }
+-keep class com.bifrost.twp.data.** { *; }
+-keep class com.bifrost.twp.util.** { *; }

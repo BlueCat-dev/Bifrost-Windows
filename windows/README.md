@@ -59,7 +59,7 @@ cd Bifrost/windows
 go test -v ./...
 
 # Compile GUI binary (No console window)
-CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags "-s -w -H=windowsgui -X main.Version=3.3.0" -o dist/Bifrost.exe ./cmd/bifrost
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags "-s -w -H=windowsgui -X main.Version=3.4.0" -o dist/Bifrost.exe ./cmd/bifrost
 
 # Optional: Compile NSIS Setup Installer
 makensis installer.nsi

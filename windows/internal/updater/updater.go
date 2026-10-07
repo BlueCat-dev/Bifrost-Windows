@@ -27,7 +27,7 @@ const (
 	DefaultUpdateRepo = "BlueCat-dev/Bifrost-Windows"
 
 	// UserAgentHeader required by GitHub API
-	UserAgentHeader = "Bifrost-Windows-Client/3.3.0 (Windows NT 10.0; Win64; x64)"
+	UserAgentHeader = "Bifrost-Windows-Client/3.4.0 (Windows NT 10.0; Win64; x64)"
 )
 
 var (

@@ -9,9 +9,9 @@ import android.net.Uri
  *   twp://[secret@]workerHost[:port]?clean_ip=cleanIp#ConfigName
  *
  * Examples:
- *   twp://telp.qorvhe-x.workers.dev?clean_ip=1music.cc#Worker1
- *   twp://mysecret@telp.qorvhe-x.workers.dev?clean_ip=1music.cc#Worker1
- *   twp://mysecret@telp.qorvhe-x.workers.dev:8443?clean_ip=1music.cc#Worker1
+ *   twp://my-worker.example.workers.dev?clean_ip=104.16.1.1#Worker1
+ *   twp://mysecret@my-worker.example.workers.dev?clean_ip=104.16.1.1#Worker1
+ *   twp://mysecret@my-worker.example.workers.dev:8443?clean_ip=104.16.1.1#Worker1
  */
 object TwpLinkParser {
 

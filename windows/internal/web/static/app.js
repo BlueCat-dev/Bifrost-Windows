@@ -10,7 +10,7 @@ const state = {
   proxies: [],
   lastPingMs: 0,
   editingProxyId: null,
-  appVersion: '3.3.0',
+  appVersion: '3.4.0',
   latestUpdateInfo: null
 };
 
@@ -195,7 +195,7 @@ async function checkUpdateManual() {
 
   try {
     let updateData = null;
-    let curVer = state.appVersion || '3.3.0';
+    let curVer = state.appVersion || '3.4.0';
 
     // 1. Try Go backend check first
     try {
@@ -272,9 +272,24 @@ async function applyUpdateNow() {
   }
 }
 
+function openExternalUrl(url) {
+  api('/api/open-external', 'POST', { url: url }).catch(() => {
+    window.open(url, '_blank');
+  });
+}
+
+function openGitHubRepo() {
+  openExternalUrl('https://github.com/BlueCat-dev/Bifrost-Windows');
+}
+
+function openCloudflareTokenPage() {
+  const tokenTemplateUrl = 'https://dash.cloudflare.com/profile/api-tokens?permissionGroupKeys=%5B%7B%22key%22%3A%22workers_scripts%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22workers_routes%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22account_settings%22%2C%22type%22%3A%22read%22%7D%5D&accountId=*&zoneId=all&name=Bifrost%20Workers%20Token';
+  openExternalUrl(tokenTemplateUrl);
+}
+
 function openDirectDownloadLink() {
-  const url = (state.latestUpdateInfo && (state.latestUpdateInfo.setup_url || state.latestUpdateInfo.release_url)) || 'https://github.com/Qorvhex/Bifrost/releases/latest';
-  window.open(url, '_blank');
+  const url = (state.latestUpdateInfo && (state.latestUpdateInfo.setup_url || state.latestUpdateInfo.release_url)) || 'https://github.com/BlueCat-dev/Bifrost-Windows/releases/latest';
+  openExternalUrl(url);
 }
 
 async function silentCheckUpdate() {
@@ -349,6 +364,74 @@ function openAddWorkerModal() {
   document.getElementById('editPort').value = '443';
   openModal('modalEdit');
   setTimeout(() => document.getElementById('editHost').focus(), 80);
+}
+
+// Open Cloudflare Modal
+function openCloudflareModal() {
+  document.getElementById('cfApiToken').value = '';
+  document.getElementById('cfSecretKey').value = '';
+  const statusBox = document.getElementById('cfDeployStatus');
+  if (statusBox) statusBox.style.display = 'none';
+  const btn = document.getElementById('btnSubmitCfDeploy');
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = 'ساخت و فعال سازی';
+  }
+  openModal('modalCloudflare');
+  setTimeout(() => document.getElementById('cfApiToken').focus(), 80);
+}
+
+// Deploy Cloudflare Worker Form
+async function deployCloudflareForm(e) {
+  e.preventDefault();
+  const token = document.getElementById('cfApiToken').value.trim();
+  const secret = document.getElementById('cfSecretKey').value.trim();
+
+  if (!token) {
+    showToast('لطفا کلید API کلادفلر را وارد کنید.');
+    return;
+  }
+
+  const btn = document.getElementById('btnSubmitCfDeploy');
+  const statusBox = document.getElementById('cfDeployStatus');
+  const statusText = document.getElementById('cfDeployStatusText');
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'در حال ساخت ورکر...';
+  }
+  if (statusBox) {
+    statusBox.style.display = 'block';
+    statusText.textContent = 'در حال ارتباط با کلادفلر و ایجاد اسکریپت ورکر...';
+  }
+
+  try {
+    const res = await api('/api/cloudflare/deploy', 'POST', {
+      api_token: token,
+      secret_key: secret
+    });
+
+    if (res.success) {
+      showToast('ورکر کلادفلر با موفقیت ساخته شد و آماده اتصال است!');
+      closeModal('modalCloudflare');
+      await fetchFullStatus();
+    } else {
+      showToast('خطا در ساخت ورکر: ' + (res.error || 'ناشناخته'));
+      if (statusBox) {
+        statusText.textContent = res.error || 'خطا در عملیات';
+      }
+    }
+  } catch (err) {
+    showToast('خطا در برقراری ارتباط: ' + err.message);
+    if (statusBox) {
+      statusText.textContent = err.message;
+    }
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'ساخت و فعال سازی';
+    }
+  }
 }
 
 // Edit specific config

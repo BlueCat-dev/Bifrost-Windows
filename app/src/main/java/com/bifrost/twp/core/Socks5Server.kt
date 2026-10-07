@@ -152,8 +152,10 @@ class Socks5Server(
                 proxyConfig = activeConfig,
                 scope = scope,
                 onCloseCallback = {
-                    val remaining = activeConnections.decrementAndGet()
-                    onConnectionCountChanged(maxOf(0, remaining))
+                    if (isRunning.get()) {
+                        val remaining = activeConnections.decrementAndGet()
+                        onConnectionCountChanged(maxOf(0, remaining))
+                    }
                 }
             )
             bridge.start()
@@ -173,7 +175,6 @@ class Socks5Server(
             serverSocket = null
             serverJob?.cancel()
             activeConnections.set(0)
-            onConnectionCountChanged(0)
         }
     }
 

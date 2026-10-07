@@ -45,7 +45,7 @@ data class ProxyConfig(
             return ProxyConfig(
                 id = json.optString("id", UUID.randomUUID().toString()),
                 name = json.optString("name", "Worker Proxy"),
-                workerHost = json.getString("workerHost"),
+                workerHost = json.optString("workerHost", ""),
                 cleanIp = if (cleanIpRaw.isNotBlank()) cleanIpRaw else null,
                 secret = if (secretRaw.isNotBlank()) secretRaw else null,
                 port = json.optInt("port", 443),

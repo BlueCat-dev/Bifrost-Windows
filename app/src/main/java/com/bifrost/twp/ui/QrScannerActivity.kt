@@ -43,6 +43,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -84,6 +85,17 @@ class QrScannerActivity : ComponentActivity() {
             }
         }
 
+    override fun attachBaseContext(newBase: android.content.Context) {
+        val prefs = newBase.getSharedPreferences("bifrost_preferences", android.content.Context.MODE_PRIVATE)
+        val lang = prefs.getString("key_app_language", "en") ?: "en"
+        val locale = java.util.Locale(lang)
+        java.util.Locale.setDefault(locale)
+        val config = android.content.res.Configuration(newBase.resources.configuration)
+        config.setLocale(locale)
+        config.setLayoutDirection(locale)
+        super.attachBaseContext(newBase.createConfigurationContext(config))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -91,8 +103,10 @@ class QrScannerActivity : ComponentActivity() {
             requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
 
+        val repository = ProxyRepository.getInstance(applicationContext)
         setContent {
-            BifrostTheme {
+            val appLanguage by repository.appLanguageFlow.collectAsState(initial = "en")
+            BifrostTheme(language = appLanguage) {
                 ScannerScreen(
                     isTorchOn = isTorchOn,
                     onToggleTorch = {
@@ -167,7 +181,9 @@ class QrScannerActivity : ComponentActivity() {
 
             if (parsedConfig != null) {
                 repository.addOrUpdateProxy(parsedConfig, makeActive = true)
-                BifrostBridgeService.start(applicationContext)
+                if (repository.isBridgeEnabledFlow.value) {
+                    BifrostBridgeService.start(applicationContext)
+                }
                 Toast.makeText(this, getString(R.string.msg_proxy_saved), Toast.LENGTH_SHORT).show()
                 finish()
             } else {
@@ -242,7 +258,7 @@ fun ScannerScreen(
             ) {
                 Icon(
                     imageVector = Icons.Outlined.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.action_close),
                     tint = TextPrimary
                 )
             }
@@ -258,7 +274,7 @@ fun ScannerScreen(
             ) {
                 Icon(
                     imageVector = if (isTorchOn) Icons.Outlined.FlashOn else Icons.Outlined.FlashOff,
-                    contentDescription = "Torch",
+                    contentDescription = stringResource(R.string.action_torch),
                     tint = if (isTorchOn) NeonCyan else TextPrimary
                 )
             }
@@ -266,7 +282,7 @@ fun ScannerScreen(
 
         // Bottom Instruction
         Text(
-            text = "Point camera at a twp:// QR code",
+            text = stringResource(R.string.qr_scan_instruction),
             color = TextPrimary,
             fontSize = 13.sp,
             fontWeight = FontWeight.Medium,

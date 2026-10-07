@@ -10,13 +10,13 @@ RequestExecutionLevel admin
 SetCompressor /SOLID lzma
 
 ; Branding & Metadata
-VIProductVersion "3.3.0.0"
+VIProductVersion "3.4.0.0"
 VIAddVersionKey "ProductName" "Bifrost for Windows"
 VIAddVersionKey "CompanyName" "Bifrost for Windows"
 VIAddVersionKey "LegalCopyright" "Bifrost for Windows"
 VIAddVersionKey "FileDescription" "Bifrost Installer"
-VIAddVersionKey "FileVersion" "3.3.0.0"
-VIAddVersionKey "ProductVersion" "3.3.0.0"
+VIAddVersionKey "FileVersion" "3.4.0.0"
+VIAddVersionKey "ProductVersion" "3.4.0.0"
 
 ; Icons
 !define MUI_ICON "app.ico"
@@ -57,8 +57,9 @@ Section "Bifrost Core" SecCore
   Delete "$INSTDIR\Bifrost-Console.exe"
   Delete "$SMPROGRAMS\Bifrost\Bifrost (Console).lnk"
 
-  ; Write ONLY the single main standalone binary
+  ; Write main standalone binary and icon
   File "dist/Bifrost.exe"
+  File "/oname=app.ico" "app.ico"
 
   ; Create Uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
@@ -68,19 +69,26 @@ Section "Bifrost Core" SecCore
 
   ; Windows Add/Remove Programs (Control Panel & Settings) Registration
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Bifrost" "DisplayName" "Bifrost for Windows"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Bifrost" "DisplayVersion" "3.3.0"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Bifrost" "DisplayVersion" "3.4.0"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Bifrost" "Publisher" "Bifrost for Windows"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Bifrost" "DisplayIcon" "$INSTDIR\Bifrost.exe,0"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Bifrost" "DisplayIcon" "$INSTDIR\app.ico,0"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Bifrost" "UninstallString" '"$INSTDIR\Uninstall.exe"'
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Bifrost" "QuietUninstallString" '"$INSTDIR\Uninstall.exe" /S'
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Bifrost" "NoModify" 1
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Bifrost" "NoRepair" 1
 
-  ; Shortcuts
+  ; Remove any cached old shortcuts first
+  Delete "$DESKTOP\Bifrost.lnk"
+  Delete "$SMPROGRAMS\Bifrost\Bifrost.lnk"
+
+  ; Create fresh shortcuts pointing to new icon
   CreateDirectory "$SMPROGRAMS\Bifrost"
-  CreateShortcut "$SMPROGRAMS\Bifrost\Bifrost.lnk" "$INSTDIR\Bifrost.exe" "" "$INSTDIR\Bifrost.exe" 0
-  CreateShortcut "$SMPROGRAMS\Bifrost\Uninstall Bifrost.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
-  CreateShortcut "$DESKTOP\Bifrost.lnk" "$INSTDIR\Bifrost.exe" "" "$INSTDIR\Bifrost.exe" 0
+  CreateShortcut "$SMPROGRAMS\Bifrost\Bifrost.lnk" "$INSTDIR\Bifrost.exe" "" "$INSTDIR\app.ico" 0
+  CreateShortcut "$SMPROGRAMS\Bifrost\Uninstall Bifrost.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\app.ico" 0
+  CreateShortcut "$DESKTOP\Bifrost.lnk" "$INSTDIR\Bifrost.exe" "" "$INSTDIR\app.ico" 0
+
+  ; Flush Windows Shell icon cache to show new desktop icon immediately
+  System::Call 'shell32::SHChangeNotify(i 0x08000000, i 0, p 0, p 0)'
 SectionEnd
 
 ; Uninstaller Section
@@ -113,4 +121,7 @@ Section "Uninstall"
   DeleteRegKey HKLM "Software\Bifrost"
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Bifrost"
   DeleteRegKey HKCU "Software\Bifrost"
+
+  ; Flush Windows Shell icon cache
+  System::Call 'shell32::SHChangeNotify(i 0x08000000, i 0, p 0, p 0)'
 SectionEnd

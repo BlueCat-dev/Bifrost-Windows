@@ -55,7 +55,7 @@ jobs:
           rsrc -arch amd64 -ico app.ico -o cmd/bifrost/rsrc_windows_amd64.syso
           APP_VER="${{ github.ref_name }}"
           if [ -z "$APP_VER" ] || [[ "$APP_VER" == "main" ]] || [[ "$APP_VER" == "master" ]]; then
-            APP_VER="3.3.0"
+            APP_VER="3.4.0"
           fi
           echo "Compiling Bifrost Windows for version: $APP_VER"
           CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build \

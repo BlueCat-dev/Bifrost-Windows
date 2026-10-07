@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/Qorvhex/Bifrost/windows/internal/cfdeploy"
 	"github.com/Qorvhex/Bifrost/windows/internal/config"
 	"github.com/Qorvhex/Bifrost/windows/internal/core"
 	"github.com/Qorvhex/Bifrost/windows/internal/updater"
@@ -127,6 +128,7 @@ func (s *Server) Start() error {
 	mux.HandleFunc("/api/bridge/toggle", s.handleToggleBridge)
 	mux.HandleFunc("/api/proxies", s.handleProxies)
 	mux.HandleFunc("/api/proxies/import", s.handleImportProxy)
+	mux.HandleFunc("/api/cloudflare/deploy", s.handleCloudflareDeploy)
 	mux.HandleFunc("/api/proxies/active", s.handleSetActiveProxy)
 	mux.HandleFunc("/api/settings", s.handleSettings)
 	mux.HandleFunc("/api/settings/port", s.handleSettings)
@@ -134,6 +136,7 @@ func (s *Server) Start() error {
 	mux.HandleFunc("/api/update/check", s.handleCheckUpdate)
 	mux.HandleFunc("/api/update/apply", s.handleApplyUpdate)
 	mux.HandleFunc("/api/launch-telegram", s.handleLaunchTelegram)
+	mux.HandleFunc("/api/open-external", s.handleOpenExternal)
 	mux.HandleFunc("/api/shutdown", s.handleShutdown)
 
 	// WebSocket Live Stream
@@ -312,6 +315,47 @@ func (s *Server) handleImportProxy(w http.ResponseWriter, r *http.Request) {
 	s.writeJSON(w, http.StatusOK, map[string]any{
 		"success": true,
 		"proxy":   parsed,
+		"data":    s.cm.GetConfig().Proxies,
+	})
+}
+
+func (s *Server) handleCloudflareDeploy(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req struct {
+		APIToken  string `json:"api_token"`
+		SecretKey string `json:"secret_key"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		s.writeJSON(w, http.StatusBadRequest, map[string]any{"success": false, "error": "درخواست نامعتبر است"})
+		return
+	}
+
+	deployer := cfdeploy.NewDeployer(nil, "", "")
+	cfg, err := deployer.DeployWorker(r.Context(), cfdeploy.DeployRequest{
+		APIToken:  req.APIToken,
+		SecretKey: req.SecretKey,
+	}, nil)
+	if err != nil {
+		s.writeJSON(w, http.StatusOK, map[string]any{"success": false, "error": err.Error()})
+		return
+	}
+
+	if err := s.cm.AddOrUpdateProxy(*cfg, true); err != nil {
+		s.writeJSON(w, http.StatusInternalServerError, map[string]any{"success": false, "error": err.Error()})
+		return
+	}
+
+	if s.bm.GetSnapshot().Status != core.StatusStopped {
+		_ = s.bm.Restart()
+	}
+
+	s.writeJSON(w, http.StatusOK, map[string]any{
+		"success": true,
+		"proxy":   cfg,
 		"data":    s.cm.GetConfig().Proxies,
 	})
 }
@@ -508,6 +552,38 @@ func (s *Server) handleLaunchTelegram(w http.ResponseWriter, r *http.Request) {
 		"tg_uri":    tgURI,
 		"https_uri": httpsURI,
 	})
+}
+
+func (s *Server) handleOpenExternal(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var req struct {
+		URL string `json:"url"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.URL == "" {
+		s.writeJSON(w, http.StatusBadRequest, map[string]any{"success": false, "error": "url required"})
+		return
+	}
+	if !strings.HasPrefix(req.URL, "https://") && !strings.HasPrefix(req.URL, "http://") {
+		s.writeJSON(w, http.StatusBadRequest, map[string]any{"success": false, "error": "invalid url scheme"})
+		return
+	}
+
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "windows":
+		cmd = exec.Command("cmd", "/c", "start", "", req.URL)
+	case "darwin":
+		cmd = exec.Command("open", req.URL)
+	default:
+		cmd = exec.Command("xdg-open", req.URL)
+	}
+	if cmd != nil {
+		_ = cmd.Start()
+	}
+	s.writeJSON(w, http.StatusOK, map[string]any{"success": true})
 }
 
 func (s *Server) handleShutdown(w http.ResponseWriter, r *http.Request) {

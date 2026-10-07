@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
@@ -61,7 +60,6 @@ fun StatusHeader(
     activeConnections: Int,
     localPort: Int,
     activeProxy: ProxyConfig?,
-    onEditPortClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -73,9 +71,9 @@ fun StatusHeader(
     }
 
     val stateText = when (bridgeState) {
-        BridgeState.STREAMING -> "STREAMING ($activeConnections Active)"
-        BridgeState.LISTENING -> "READY / ZERO-IDLE"
-        BridgeState.STOPPED -> "STANDBY"
+        BridgeState.STREAMING -> stringResource(R.string.status_streaming_badge, activeConnections)
+        BridgeState.LISTENING -> stringResource(R.string.status_ready_badge)
+        BridgeState.STOPPED -> stringResource(R.string.status_standby_badge)
     }
 
     Box(
@@ -89,10 +87,10 @@ fun StatusHeader(
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Top Row: Status badge & Port editor
+            // Top Row: Status badge
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Status Pill with subtle glow/pulse
@@ -119,29 +117,6 @@ fun StatusHeader(
                         letterSpacing = 0.5.sp
                     )
                 }
-
-                // Port Pill
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable { onEditPortClick() }
-                        .padding(horizontal = 6.dp, vertical = 4.dp)
-                ) {
-                    Text(
-                        text = "127.0.0.1:$localPort",
-                        color = TextSecondary,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Icon(
-                        imageVector = Icons.Outlined.Edit,
-                        contentDescription = "Edit Port",
-                        tint = TextMuted,
-                        modifier = Modifier.size(14.dp)
-                    )
-                }
             }
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -164,7 +139,7 @@ fun StatusHeader(
                 if (!activeProxy.cleanIp.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Clean IP: ${activeProxy.cleanIp}",
+                        text = stringResource(R.string.clean_ip_label, activeProxy.cleanIp),
                         color = NeonEmerald,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
@@ -172,13 +147,13 @@ fun StatusHeader(
                 }
             } else {
                 Text(
-                    text = "No Active Worker Selected",
+                    text = stringResource(R.string.no_active_worker_title),
                     color = WarningAmber,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = "Add or select a worker config below to begin bridging.",
+                    text = stringResource(R.string.no_active_worker_sub),
                     color = TextMuted,
                     fontSize = 12.sp
                 )

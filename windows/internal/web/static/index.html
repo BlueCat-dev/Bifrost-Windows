@@ -46,14 +46,20 @@
         </div>
       </div>
 
-      <!-- Action Row: Add Worker Button + Power Button -->
+      <!-- Action Row: Add Worker Button + Cloudflare Deploy Button + Power Button -->
       <div class="action-row">
-        <button class="btn-add-worker" onclick="openAddWorkerModal()">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <button class="btn-add-worker" onclick="openAddWorkerModal()" title="افزودن دستی لینک یا دامنه ورکر">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <line x1="12" y1="5" x2="12" y2="19"/>
             <line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
-          <span>افزودن لینک ورکر</span>
+          <span>افزودن لینک</span>
+        </button>
+        <button class="btn-cf-worker" onclick="openCloudflareModal()" title="ساخت خودکار ورکر کلادفلر با توکن">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+          </svg>
+          <span>ساخت ورکر</span>
         </button>
         <button class="btn-power stopped" id="btnPower" onclick="toggleBridge()" title="روشن کردن پل">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
@@ -100,21 +106,42 @@
     </div>
   </div>
 
-  <!-- Modal: Settings (Port) -->
+  <!-- Modal: Settings (Port & About) -->
   <div class="modal-overlay" id="modalSettings">
     <div class="modal-content">
       <div class="modal-header">
-        <div class="modal-title">تنظیمات پورت محلی</div>
+        <div class="modal-title">تنظیمات برنامه</div>
         <button class="btn-action-icon" onclick="closeModal('modalSettings')">✕</button>
       </div>
       <form onsubmit="saveSettingsForm(event)">
         <div class="form-group">
           <label class="form-label">پورت محلی ساکس۵ (Local SOCKS5 Port)</label>
           <input type="number" id="settingsPort" class="form-input" min="1024" max="65535" value="5050" required>
-          <div class="form-help">پورت پیش‌فرض ۵۰۵۰ است. تلگرام را روی این پورت تنظیم کنید.</div>
+          <div class="form-help">پورت پیش فرض ۵۰۵۰ است. تلگرام را روی این پورت تنظیم کنید.</div>
         </div>
-        <div class="modal-buttons">
-          <button type="button" class="btn-secondary" onclick="resetDefaultPort()" title="بازنشانی پورت پیش‌فرض ۵۰۵۰">پیش‌فرض (۵۰۵۰)</button>
+
+        <!-- GitHub Repository Card -->
+        <div class="settings-github-card" onclick="openGitHubRepo()" title="مشاهده سورس کد پروژه در گیت هاب">
+          <div class="settings-github-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+          </div>
+          <div class="settings-github-info">
+            <div class="settings-github-title">سورس کد و منبع رسمی گیت هاب</div>
+            <div class="settings-github-link">github.com/BlueCat-dev/Bifrost-Windows</div>
+          </div>
+          <div class="settings-github-arrow">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="modal-buttons" style="margin-top: 16px;">
+          <button type="button" class="btn-secondary" onclick="resetDefaultPort()" title="بازنشانی پورت پیش فرض ۵۰۵۰">پیش فرض (۵۰۵۰)</button>
           <button type="button" class="btn-secondary" onclick="closeModal('modalSettings')">انصراف</button>
           <button type="submit" class="btn-primary">ذخیره تنظیمات</button>
         </div>
@@ -148,6 +175,52 @@
     </div>
   </div>
 
+  <!-- Modal: Cloudflare In-App Deployer -->
+  <div class="modal-overlay" id="modalCloudflare">
+    <div class="modal-content" style="max-width: 380px;">
+      <div class="modal-header">
+        <div class="modal-title" style="display: flex; align-items: center; gap: 6px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2.2">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+          </svg>
+          <span>ساخت خودکار ورکر کلادفلر</span>
+        </div>
+        <button class="btn-action-icon" onclick="closeModal('modalCloudflare')">✕</button>
+      </div>
+      <form onsubmit="deployCloudflareForm(event)">
+        <div class="form-group">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <label class="form-label" style="margin-bottom: 0;">کلید API کلادفلر (API Token) *</label>
+            <button type="button" class="btn-token-link" onclick="openCloudflareTokenPage()" title="باز کردن مستقیم صفحه ساخت توکن در داشبورد کلادفلر">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/>
+                <line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+              <span>دریافت توکن</span>
+            </button>
+          </div>
+          <input type="password" id="cfApiToken" class="form-input" placeholder="کلید API با دسترسی Workers..." required autocomplete="off">
+          <div class="form-help">با کلیک روی «دریافت توکن»، صفحه ساخت کلید با تمام دسترسی های لازم به صورت خودکار باز می شود و فقط کافیست دکمه ساخت توکن را در کلادفلر بزنید.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">رمز عبور امنیتی / Secret (اختیاری)</label>
+          <input type="password" id="cfSecretKey" class="form-input" placeholder="در صورت نیاز به Secret در ورکر">
+        </div>
+        <div id="cfDeployStatus" style="display: none; margin-bottom: 12px; padding: 8px 10px; border-radius: 8px; background: rgba(0, 240, 255, 0.08); border: 1px solid rgba(0, 240, 255, 0.2); font-size: 11.5px; color: var(--cyan); line-height: 1.5;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="pulse-dot" style="background: var(--cyan);"></div>
+            <span id="cfDeployStatusText">در حال ارسال...</span>
+          </div>
+        </div>
+        <div class="modal-buttons">
+          <button type="button" class="btn-secondary" onclick="closeModal('modalCloudflare')">انصراف</button>
+          <button type="submit" id="btnSubmitCfDeploy" class="btn-primary">ساخت و فعال سازی</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Modal: Auto Update -->
   <div class="modal-overlay" id="modalUpdate">
     <div class="modal-content">
@@ -163,7 +236,7 @@
           </div>
           <div class="update-version-row">
             <span class="update-label">نسخه فعلی شما:</span>
-            <span class="update-val-cur" id="updateCurVer">v3.3.0</span>
+            <span class="update-val-cur" id="updateCurVer">v3.4.0</span>
           </div>
           <div class="update-changelog-box" id="updateChangelog"></div>
         </div>

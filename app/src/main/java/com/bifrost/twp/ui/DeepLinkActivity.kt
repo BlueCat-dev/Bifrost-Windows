@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
+import com.bifrost.twp.R
 import com.bifrost.twp.core.BifrostBridgeService
 import com.bifrost.twp.data.ProxyRepository
 import com.bifrost.twp.model.TwpLinkParser
@@ -56,11 +57,11 @@ class DeepLinkActivity : Activity() {
 
                 Toast.makeText(
                     applicationContext,
-                    "Bifrost: Connected -> ${parsedConfig.name}",
+                    getString(R.string.toast_proxy_activated_named, parsedConfig.name),
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                Toast.makeText(applicationContext, "Bifrost: Invalid link format", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, getString(R.string.msg_invalid_clipboard), Toast.LENGTH_SHORT).show()
             }
         }
 
